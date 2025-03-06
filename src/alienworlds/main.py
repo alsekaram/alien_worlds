@@ -58,7 +58,7 @@ async def main():
 
 if __name__ == "__main__":
     log = logging.getLogger(__name__)
-    configure_color_logging(level=logging.INFO)
+    configure_color_logging(level=logging.DEBUG)
     start_http_server(8001)
 
     asyncio.run(main())
