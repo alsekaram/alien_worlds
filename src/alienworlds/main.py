@@ -5,7 +5,7 @@ from prometheus_client import start_http_server
 
 from src.alienworlds.metrics import POOL_VALUE, MAX_POOL_VALUE  # Импортируем из отдельного модуля
 from src.alienworlds.utils.pool_monitor import PoolServer
-from config.logger_config import configure_color_logging
+from src.config.logger_config import configure_color_logging
 
 
 log = logging.getLogger(__name__)
