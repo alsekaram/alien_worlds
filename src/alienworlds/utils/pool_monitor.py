@@ -129,7 +129,7 @@ class PoolServer:
         self._running = False
         log.info("Остановка мониторинга пулов")
 
-    async def pool_monitor(self, delay_seconds):
+    async def pool_monitor(self, delay_seconds=0.5):
         """
         Мониторинг пулов планет.
 
