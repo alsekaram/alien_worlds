@@ -16,8 +16,8 @@ PROXY_HOST = os.getenv('PROXY_HOST')
 PROXY_PORT = int(os.getenv('PROXY_PORT', 0))  # Добавляем значение по умолчанию
 PROXY_NUM_WORKERS = int(os.getenv('PROXY_NUM_WORKERS', 1))
 # Добавляем настройку задержки через переменную окружения
-POOL_MONITOR_DELAY = float(os.getenv('POOL_MONITOR_DELAY', 5.0))  # Как часто обновляем данные (секунды)
-DISPLAY_INTERVAL = float(os.getenv('DISPLAY_INTERVAL', 5.0))  # Как часто выводим информацию (секунды)
+POOL_MONITOR_DELAY = float(os.getenv('POOL_MONITOR_DELAY', 0.5))  # Как часто обновляем данные (секунды)
+DISPLAY_INTERVAL = float(os.getenv('DISPLAY_INTERVAL', 0.2))  # Как часто выводим информацию (секунды)
 
 # Список планет и типов редкости для избежания дублирования
 PLANETS = ["magor", "neri", "veles", "eyeke", "naron", "kavian"]
