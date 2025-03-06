@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 1s      # По умолчанию каждую секунду
+  evaluation_interval: 1s   # Оценка правил каждую секунду
+
+scrape_configs:
+  - job_name: 'alien_worlds_pools'
+    static_configs:
+      - targets: ['app:8000']
+    scrape_interval: 1s  # Сбор метрик каждые 0.3 секунды
+    scrape_timeout: 1s   # Таймаут на сбор
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 5s    # Для самого Prometheus можно оставить больший интервал
