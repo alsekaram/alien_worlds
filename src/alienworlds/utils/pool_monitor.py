@@ -6,6 +6,7 @@ import os
 from eosapi import EosApi
 
 from src.config.logger_config import configure_color_logging
+from src.alienworlds.metrics import POOL_VALUE, MAX_POOL_VALUE
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -33,11 +34,25 @@ class PoolServer:
     def __init__(self):
         """Инициализация сервера."""
         self.rpc_host = WAX_RPC_HOST  # Используем константу вместо повторного присваивания
-        self.wax_api = EosApi(
-            rpc_host=self.rpc_host,
-            proxy=(PROXY_HOST, PROXY_PORT, PROXY_NUM_WORKERS),
-            yeomen_proxy=(PROXY_HOST, PROXY_PORT, PROXY_NUM_WORKERS),
-        )
+        log.info(f"Инициализация с WAX RPC: {self.rpc_host}")
+
+        # Проверяем настройки прокси
+        proxy_config = None
+        if PROXY_HOST and PROXY_PORT > 0:
+            proxy_config = (PROXY_HOST, PROXY_PORT, PROXY_NUM_WORKERS)
+            log.info(f"Используем прокси: {PROXY_HOST}:{PROXY_PORT}")
+
+        try:
+            self.wax_api = EosApi(
+                rpc_host=self.rpc_host,
+                proxy=proxy_config,
+                yeomen_proxy=proxy_config,
+            )
+            log.info("API клиент WAX инициализирован успешно")
+        except Exception as e:
+            log.error(f"Ошибка инициализации API клиента WAX: {e}")
+            raise
+
         # Инициализируем словарь для всех планет сразу
         self.pools_data = {planet: {} for planet in PLANETS}
         self._running = False  # Флаг для управления циклом мониторинга
@@ -61,7 +76,18 @@ class PoolServer:
             pool_value = float(bucket["value"].replace(" TLM", ""))
             pools[pool_name] = pool_value
 
+            # Обновляем метрику для каждого пула
+            POOL_VALUE.labels(planet=planet_name, rarity=pool_name).set(pool_value)
+            log.debug(f"Обновлена метрика для {planet_name} {pool_name}: {pool_value}")
+
         self.pools_data[planet_name] = pools
+
+        # Обновляем метрики максимальных значений
+        for rarity in RARITIES:
+            max_planet, max_value = self.get_max_pool_planet(rarity)
+            if max_planet and max_value > 0:
+                MAX_POOL_VALUE.labels(planet=max_planet, rarity=rarity).set(max_value)
+                log.debug(f"Обновлена максимальная метрика для {rarity}: {max_planet} - {max_value}")
 
     def get_max_pool_planet(self, rarity):
         """
@@ -147,9 +173,15 @@ class PoolServer:
                 has_data = any(bool(pools) for pools in self.pools_data.values())
                 if has_data:
                     self.data_loaded = True
+                    log.info("Данные по пулам успешно получены")
 
-                # Просто обновляем данные, без вывода
-                log.debug("Данные пулов обновлены")
+                    # Логируем максимальные значения для каждого типа редкости
+                    for rarity in RARITIES:
+                        max_planet, max_value = self.get_max_pool_planet(rarity)
+                        if max_planet:
+                            log.info(f"MAX {rarity}: {max_planet} - {max_value} TLM")
+                else:
+                    log.warning("Нет данных ни по одной планете")
 
             except asyncio.CancelledError:
                 log.info("Мониторинг пулов отменен")
