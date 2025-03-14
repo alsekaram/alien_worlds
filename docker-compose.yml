@@ -15,8 +15,6 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
-    depends_on:
-      - prometheus
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
@@ -39,12 +37,14 @@ services:
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
-      - '--storage.tsdb.retention.time=24h'  # Храним данные только за 24 часа для экономии ресурсов
+      - '--storage.tsdb.retention.time=240y'  # Храним данные только за 24 часа для экономии ресурсов
     deploy:
       resources:
         limits:
           cpus: '0.50'
           memory: 1G
+    depends_on:
+      - app
 
   grafana:
     image: grafana/grafana:latest
