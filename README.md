@@ -77,6 +77,7 @@ cd alien_worlds
 mkdir -p secrets
 cp secrets-example/grafana_admin_user.txt.example secrets/grafana_admin_user.txt
 openssl rand -base64 32 > secrets/grafana_admin_password.txt
+sudo chown 472:472 secrets/grafana_admin_*.txt
 chmod 600 secrets/grafana_admin_*.txt
 ```
 
