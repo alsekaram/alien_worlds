@@ -57,13 +57,16 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./secrets:/run/secrets:ro
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER__FILE=/run/secrets/grafana_admin_user.txt
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password.txt
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=100ms
+      # - GF_SERVER_ROOT_URL=https://YOUR_DOMAIN
+      # - GF_SERVER_DOMAIN=YOUR_DOMAIN
     deploy:
       resources:
         limits:
@@ -72,6 +75,27 @@ services:
     depends_on:
       - prometheus
 
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    networks:
+      - monitoring
+    ports:
+      # локально открываем 8080 (HTTP). В проде используем 80/443
+      - "${DOMAIN:-}:80"
+      - "${DOMAIN:-}:443"
+      - "8080:8080"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - ACME_AGREE=true
+      - EMAIL=${ACME_EMAIL:-admin@example.com}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - grafana
+
 networks:
   monitoring:
     driver: bridge
@@ -79,3 +103,5 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
+  caddy_data:
+  caddy_config:
