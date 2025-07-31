@@ -18,6 +18,13 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
+      - WAX_RPC_HOST=${WAX_RPC_HOST:-https://wax.greymass.com}
+      - PROXY_HOST=${PROXY_HOST:-}
+      - PROXY_PORT=${PROXY_PORT:-0}
+      - PROXY_NUM_WORKERS=${PROXY_NUM_WORKERS:-1}
+      - POOL_MONITOR_DELAY=${POOL_MONITOR_DELAY:-0.5}
+      - DISPLAY_INTERVAL=${DISPLAY_INTERVAL:-0.5}
+      - DISPLAY_MODE=${DISPLAY_MODE:-max}
 
     restart: unless-stopped
 
