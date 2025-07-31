@@ -70,7 +70,7 @@ your-domain.com → 1.2.3.4
 
 ### 3. Клонирование и настройка
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/alsekaram/alien_worlds.git
 cd alien_worlds
 
 # Создать секреты
