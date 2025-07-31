@@ -72,8 +72,8 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=100ms
-      # - GF_SERVER_ROOT_URL=https://YOUR_DOMAIN
-      # - GF_SERVER_DOMAIN=YOUR_DOMAIN
+      - GF_SERVER_ROOT_URL=${DOMAIN:+https://${DOMAIN}}
+      - GF_SERVER_DOMAIN=${DOMAIN}
     deploy:
       resources:
         limits:
@@ -88,9 +88,8 @@ services:
     networks:
       - monitoring
     ports:
-      # локально открываем 8080 (HTTP). В проде используем 80/443
-      - "${DOMAIN:-}:80"
-      - "${DOMAIN:-}:443"
+      - "80:80"
+      - "443:443" 
       - "8080:8080"
     environment:
       - DOMAIN=${DOMAIN}
