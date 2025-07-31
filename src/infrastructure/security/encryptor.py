@@ -3,9 +3,7 @@ from cryptography.fernet import Fernet, InvalidToken
 
 class Encryptor:
     def __init__(self, key):
-        # self.key = b'_yyyQ2NgL06AumL67HfgB7XK53sqRYCqyCaudVbdCOB='  # Функция для загрузки ключа
         self.key = key
-        # self.key = load_encryption_key()  # Функция для загрузки ключа
         self.fernet = Fernet(self.key)
 
     def encrypt(self, data):
